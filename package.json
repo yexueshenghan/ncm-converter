@@ -1,0 +1,68 @@
+{
+  "name": "ncm-converter",
+  "productName": "NCM Converter",
+  "version": "1.0.0",
+  "description": "网易云音乐 NCM 文件本地转码工具",
+  "main": "main.js",
+  "author": "tyoutou",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
+  "dependencies": {
+    "node-id3": "^0.2.6"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.tyoutou.ncmconverter",
+    "productName": "NCM Converter",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "renderer/**/*",
+      "build/icon.icns",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "vendor/ffmpeg/${os}-${arch}",
+        "to": "ffmpeg"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.music",
+      "icon": "build/icon.icns",
+      "target": [
+        {
+          "target": "dmg"
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable"
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "NCM-Converter-${version}-win-x64.exe"
+    },
+    "dmg": {
+      "artifactName": "NCM-Converter-${version}-${arch}.dmg"
+    }
+  }
+}

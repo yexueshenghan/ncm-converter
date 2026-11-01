@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <title>NCM 转换器</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="drag-strip" id="dragStrip"></div>
+    <header class="titlebar">
+      <div class="brand">
+        <span class="logo">♪</span>
+        <div class="brand-text">
+          <h1>NCM 转换器</h1>
+          <p>网易云音乐加密文件 · 本地解密，不联网</p>
+        </div>
+      </div>
+      <button class="ghost" id="pickBtn">选择文件</button>
+    </header>
+
+    <main>
+      <section class="dropzone" id="dropzone">
+        <div class="drop-inner">
+          <div class="drop-icon">⇣</div>
+          <p class="drop-title">把 .ncm 文件拖到这里</p>
+          <p class="drop-hint">支持批量拖入，也可以点右上角选择文件</p>
+        </div>
+      </section>
+
+      <section class="list-section" hidden id="listSection">
+        <div class="list-head">
+          <span id="listCount">0 个文件</span>
+          <button class="link" id="clearBtn">清空</button>
+        </div>
+        <ul class="file-list" id="fileList"></ul>
+      </section>
+
+      <section class="output-row">
+        <div class="output-path">
+          <span class="label">输出位置</span>
+          <span class="path" id="outPath">与原文件相同文件夹</span>
+        </div>
+        <button class="ghost small" id="outBtn">更改…</button>
+        <button class="link" id="outReset" hidden>恢复默认</button>
+      </section>
+    </main>
+
+    <footer class="actions">
+      <div class="progress-wrap">
+        <div class="progress" id="progress"><div class="bar" id="bar"></div></div>
+        <span class="status" id="status">等待添加文件</span>
+      </div>
+      <button class="primary" id="convertBtn" disabled>开始转换</button>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
