@@ -6,6 +6,7 @@
 #   GH_TOKEN=ghp_xxx UPLOAD_ASSETS=0 ./tools/publish.sh   # 只推代码，不传安装包
 #
 # Token 需要 repo 权限（classic）或 Contents+Administration 权限（fine-grained）。
+# 网络慢时先开代理，并在运行前 export https_proxy=... http_proxy=...（命令行工具不会自动用系统代理）。
 set -euo pipefail
 
 : "${GH_TOKEN:?请先设置 GH_TOKEN 环境变量，例如 GH_TOKEN=ghp_xxx ./tools/publish.sh}"
@@ -64,12 +65,26 @@ shopt -s nullglob
 for FILE in dist/*.dmg dist/*.exe; do
   NAME=$(basename "$FILE")
   echo "==> 上传 $NAME ($(du -h "$FILE" | cut -f1))"
-  curl -sS --retry 3 -H "Authorization: Bearer $GH_TOKEN" \
+  CODE=$(curl --http1.1 -sS --retry 5 --retry-delay 3 --retry-all-errors \
+    -o /tmp/gh-asset.json -w '%{http_code}' \
+    -H "Authorization: Bearer $GH_TOKEN" \
     -H "Content-Type: application/octet-stream" \
     --data-binary "@$FILE" \
-    "$API/uploads/repos/$LOGIN/$REPO_NAME/releases/$RELEASE_ID/assets?name=$NAME" \
-    -o /tmp/gh-asset.json
-  python3 -c "import sys,json;d=json.load(open('/tmp/gh-asset.json'));print('   ->', d.get('browser_download_url') or d)"
+    "$API/uploads/repos/$LOGIN/$REPO_NAME/releases/$RELEASE_ID/assets?name=$NAME")
+  SIZE=$(stat -f%z "$FILE" 2>/dev/null || stat -c%s "$FILE")
+  if [ "$CODE" != "201" ]; then
+    echo "   上传失败（HTTP $CODE）："; cat /tmp/gh-asset.json; echo; exit 1
+  fi
+  PYTHONIOENCODING=utf-8 python3 - "$SIZE" <<'PY'
+import json, sys
+size = int(sys.argv[1])
+d = json.load(open('/tmp/gh-asset.json'))
+if d.get('size') == size:
+    print('   -> 已上传，大小校验一致', d.get('browser_download_url'))
+else:
+    print(f"   -> 大小不一致：本地 {size}，远端 {d.get('size')}")
+    sys.exit(1)
+PY
 done
 
 echo "==> 完成：https://github.com/$LOGIN/$REPO_NAME"
