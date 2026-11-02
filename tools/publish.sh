@@ -40,7 +40,11 @@ esac
 echo "==> 推送代码"
 git remote remove origin 2>/dev/null || true
 git remote add origin "https://github.com/$LOGIN/$REPO_NAME.git"
-git push "https://x-access-token:$GH_TOKEN@github.com/$LOGIN/$REPO_NAME.git" main:main
+if ! git push "https://x-access-token:$GH_TOKEN@github.com/$LOGIN/$REPO_NAME.git" main:main 2>&1 \
+  | sed 's#x-access-token:[^@]*@#x-access-token:***@#g'; then
+  echo "推送失败（上面的日志里的 token 已打码）"
+  exit 1
+fi
 git branch --set-upstream-to="origin/main" main >/dev/null 2>&1 || true
 
 if [ "$UPLOAD_ASSETS" = "0" ]; then
