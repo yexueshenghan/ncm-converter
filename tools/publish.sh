@@ -17,6 +17,7 @@ VISIBILITY="${VISIBILITY:-private}"
 UPLOAD_ASSETS="${UPLOAD_ASSETS:-1}"
 TAG="${TAG:-v1.0.0}"
 API="https://api.github.com"
+UPLOADS="https://uploads.github.com"
 
 json_get() {
   python3 -c "import sys,json;d=json.load(sys.stdin);print(d$1)"
@@ -70,7 +71,7 @@ for FILE in dist/*.dmg dist/*.exe; do
     -H "Authorization: Bearer $GH_TOKEN" \
     -H "Content-Type: application/octet-stream" \
     --data-binary "@$FILE" \
-    "$API/uploads/repos/$LOGIN/$REPO_NAME/releases/$RELEASE_ID/assets?name=$NAME")
+    "$UPLOADS/repos/$LOGIN/$REPO_NAME/releases/$RELEASE_ID/assets?name=$NAME")
   SIZE=$(stat -f%z "$FILE" 2>/dev/null || stat -c%s "$FILE")
   if [ "$CODE" != "201" ]; then
     echo "   上传失败（HTTP $CODE）："; cat /tmp/gh-asset.json; echo; exit 1
