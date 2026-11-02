@@ -5,6 +5,8 @@
 
 ## 直接使用
 
+安装包在 [Releases](https://github.com/yexueshenghan/ncm-converter/releases/latest) 页面下载：
+
 - macOS：安装 `NCM Converter-1.0.0-arm64.dmg`（Apple Silicon）或 `-x64.dmg`（Intel），把 App 拖进「应用程序」。
 - Windows：运行 `NCM-Converter-1.0.0-win-x64.exe`，绿色单文件，无需安装。
 
