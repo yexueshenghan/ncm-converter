@@ -7,9 +7,16 @@
 #
 # Token 需要 repo 权限（classic）或 Contents+Administration 权限（fine-grained）。
 # 网络慢时先开代理，并在运行前 export https_proxy=... http_proxy=...（命令行工具不会自动用系统代理）。
+# 不设 GH_TOKEN 时会自动从 macOS 钥匙串读取已保存的 GitHub 凭据：
+#   printf "protocol=https\nhost=github.com\nusername=<登录名>\npassword=<token>\n\n" | git credential-osxkeychain store
+# 显式传入：GH_TOKEN=ghp_xxx ./tools/publish.sh
 set -euo pipefail
 
-: "${GH_TOKEN:?请先设置 GH_TOKEN 环境变量，例如 GH_TOKEN=ghp_xxx ./tools/publish.sh}"
+if [ -z "${GH_TOKEN:-}" ] && command -v git-credential-osxkeychain >/dev/null 2>&1; then
+  GH_TOKEN=$(printf 'protocol=https\nhost=github.com\n\n' \
+    | git credential-osxkeychain get 2>/dev/null | sed -n 's/^password=//p')
+fi
+: "${GH_TOKEN:?请先设置 GH_TOKEN，或用 git credential-osxkeychain 保存 GitHub 凭据}"
 cd "$(dirname "$0")/.."
 
 REPO_NAME="${REPO_NAME:-ncm-converter}"
