@@ -12,6 +12,9 @@
 # 显式传入：GH_TOKEN=ghp_xxx ./tools/publish.sh
 set -euo pipefail
 
+if [ -z "${GH_TOKEN:-}" ] && [ -f "$HOME/.config/github-token" ]; then
+  GH_TOKEN=$(cat "$HOME/.config/github-token")
+fi
 if [ -z "${GH_TOKEN:-}" ] && command -v git-credential-osxkeychain >/dev/null 2>&1; then
   GH_TOKEN=$(printf 'protocol=https\nhost=github.com\n\n' \
     | git credential-osxkeychain get 2>/dev/null | sed -n 's/^password=//p')
